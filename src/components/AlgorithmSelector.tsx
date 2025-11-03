@@ -19,7 +19,6 @@ export const AlgorithmSelector = ({
   const algorithms: { value: SchedulingAlgorithm; label: string; description: string }[] = [
     { value: 'FCFS', label: 'FCFS', description: 'First Come First Served' },
     { value: 'SJF', label: 'SJF', description: 'Shortest Job First' },
-    { value: 'SRTF', label: 'SRTF', description: 'Shortest Remaining Time First' },
     { value: 'RR', label: 'Round Robin', description: 'Time Quantum: 4ms' },
     { value: 'Priority', label: 'Priority', description: 'Higher priority first' },
     { value: 'AI', label: 'AI Scheduler', description: 'ML-powered optimization' },

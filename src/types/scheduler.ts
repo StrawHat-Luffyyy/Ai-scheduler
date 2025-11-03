@@ -31,4 +31,4 @@ export interface SchedulerResult {
   algorithm: string;
 }
 
-export type SchedulingAlgorithm = 'FCFS' | 'SJF' | 'SRTF' | 'RR' | 'Priority' | 'AI';
+export type SchedulingAlgorithm = 'FCFS' | 'SJF' | 'RR' | 'Priority' | 'AI';

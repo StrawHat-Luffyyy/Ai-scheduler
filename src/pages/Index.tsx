@@ -5,7 +5,7 @@ import { AlgorithmSelector } from '@/components/AlgorithmSelector';
 import { GanttChart } from '@/components/GanttChart';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { ProcessTable } from '@/components/ProcessTable';
-import { fcfs, sjf, srtf, roundRobin, priorityScheduling } from '@/utils/schedulingAlgorithms';
+import { fcfs, sjf, roundRobin, priorityScheduling } from '@/utils/schedulingAlgorithms';
 import { toast } from 'sonner';
 import { Cpu, Sparkles } from 'lucide-react';
 
@@ -29,9 +29,6 @@ const Index = () => {
           break;
         case 'SJF':
           simulationResult = sjf(processes);
-          break;
-        case 'SRTF':
-          simulationResult = srtf(processes);
           break;
         case 'RR':
           simulationResult = roundRobin(processes, 4);
@@ -81,7 +78,7 @@ const Index = () => {
 
             <div className="flex items-center justify-center gap-8 pt-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary font-mono">6</div>
+                <div className="text-3xl font-bold text-primary font-mono">5</div>
                 <div className="text-sm text-muted-foreground">Algorithms</div>
               </div>
               <div className="w-px h-12 bg-border" />
