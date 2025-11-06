@@ -6,6 +6,7 @@ import { GanttChart } from '@/components/GanttChart';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { ProcessTable } from '@/components/ProcessTable';
 import { fcfs, sjf, roundRobin, priorityScheduling } from '@/utils/schedulingAlgorithms';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Cpu, Sparkles } from 'lucide-react';
 
@@ -13,8 +14,9 @@ const Index = () => {
   const [processes, setProcesses] = useState<Process[]>([]);
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<SchedulingAlgorithm>('FCFS');
   const [result, setResult] = useState<SchedulerResult | null>(null);
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
 
-  const handleRunSimulation = () => {
+  const handleRunSimulation = async () => {
     if (processes.length === 0) {
       toast.error('Please add at least one process');
       return;
@@ -23,30 +25,72 @@ const Index = () => {
     let simulationResult: SchedulerResult;
 
     try {
-      switch (selectedAlgorithm) {
-        case 'FCFS':
-          simulationResult = fcfs(processes);
-          break;
-        case 'SJF':
+      if (selectedAlgorithm === 'AI') {
+        setIsAIProcessing(true);
+        toast.info('AI is analyzing your processes...');
+
+        const { data, error } = await supabase.functions.invoke('ai-scheduler', {
+          body: { processes }
+        });
+
+        setIsAIProcessing(false);
+
+        if (error) {
+          console.error('AI Scheduler error:', error);
+          toast.error('AI Scheduler failed. Using SJF as fallback.');
           simulationResult = sjf(processes);
-          break;
-        case 'RR':
-          simulationResult = roundRobin(processes, 4);
-          break;
-        case 'Priority':
-          simulationResult = priorityScheduling(processes);
-          break;
-        case 'AI':
-          toast.info('AI Scheduler coming soon! Using SJF for now.');
-          simulationResult = sjf(processes);
-          break;
-        default:
-          simulationResult = fcfs(processes);
+        } else {
+          const recommendation = data;
+          const recommendedAlgo = recommendation.algorithm;
+          
+          toast.success(`AI recommends: ${recommendedAlgo}`, {
+            description: recommendation.reason
+          });
+
+          // Run the recommended algorithm
+          switch (recommendedAlgo) {
+            case 'FCFS':
+              simulationResult = fcfs(processes);
+              break;
+            case 'SJF':
+              simulationResult = sjf(processes);
+              break;
+            case 'RR':
+              simulationResult = roundRobin(processes, 4);
+              break;
+            case 'Priority':
+              simulationResult = priorityScheduling(processes);
+              break;
+            default:
+              simulationResult = sjf(processes);
+          }
+
+          simulationResult.algorithm = `AI (${recommendedAlgo})`;
+        }
+      } else {
+        switch (selectedAlgorithm) {
+          case 'FCFS':
+            simulationResult = fcfs(processes);
+            break;
+          case 'SJF':
+            simulationResult = sjf(processes);
+            break;
+          case 'RR':
+            simulationResult = roundRobin(processes, 4);
+            break;
+          case 'Priority':
+            simulationResult = priorityScheduling(processes);
+            break;
+          default:
+            simulationResult = fcfs(processes);
+        }
+
+        toast.success(`${selectedAlgorithm} simulation completed`);
       }
 
       setResult(simulationResult);
-      toast.success(`${selectedAlgorithm} simulation completed`);
     } catch (error) {
+      setIsAIProcessing(false);
       toast.error('Simulation failed. Please check your inputs.');
       console.error(error);
     }
@@ -109,6 +153,7 @@ const Index = () => {
               onAlgorithmChange={setSelectedAlgorithm}
               onRunSimulation={handleRunSimulation}
               disabled={processes.length === 0}
+              isAIProcessing={isAIProcessing}
             />
           </div>
 

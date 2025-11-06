@@ -8,6 +8,7 @@ interface AlgorithmSelectorProps {
   onAlgorithmChange: (algorithm: SchedulingAlgorithm) => void;
   onRunSimulation: () => void;
   disabled: boolean;
+  isAIProcessing?: boolean;
 }
 
 export const AlgorithmSelector = ({
@@ -15,6 +16,7 @@ export const AlgorithmSelector = ({
   onAlgorithmChange,
   onRunSimulation,
   disabled,
+  isAIProcessing = false,
 }: AlgorithmSelectorProps) => {
   const algorithms: { value: SchedulingAlgorithm; label: string; description: string }[] = [
     { value: 'FCFS', label: 'FCFS', description: 'First Come First Served' },
@@ -55,12 +57,12 @@ export const AlgorithmSelector = ({
 
         <Button
           onClick={onRunSimulation}
-          disabled={disabled}
+          disabled={disabled || isAIProcessing}
           className="w-full shadow-glow"
           size="lg"
         >
           <Cpu className="w-4 h-4 mr-2" />
-          Run Simulation
+          {isAIProcessing ? 'AI Analyzing...' : 'Run Simulation'}
         </Button>
       </div>
     </Card>
